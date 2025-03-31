@@ -4,25 +4,27 @@
 
 import { storage, db,auth,provider } from "./firebaseConfig";  
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc, collection, query, documentId, where, getDocs, deleteDoc } from "firebase/firestore";
 import {v4 as uuidv4} from "uuid"; // npm install uuid - done
 import { signInWithPopup, signOut } from "firebase/auth";
 
 // let us call the detectlabels api
 
-async function detectlabels(imagepath:string) {
-  const apiurl = '/api/detectlabels';
+//DO WE NEED THIS?
 
-  try{
-    const response = await fetch(apiurl,{method: 'POST',headers:{'Content-Type': 'application/json'},body:JSON.stringify({imagepath})})
-    if(!response.ok){
-      throw new Error(`API called and resulted in ${response.status}`);
-    }
-    return await response.json();
-  }catch(error){
-    throw new Error(`Error runnung API`)
-  }
-}
+// async function detectlabels(imagepath:string) {
+//   const apiurl = '/api/detectlabels';
+
+//   try{
+//     const response = await fetch(apiurl,{method: 'POST',headers:{'Content-Type': 'application/json'},body:JSON.stringify({imagepath})})
+//     if(!response.ok){
+//       throw new Error(`API called and resulted in ${response.status}`);
+//     }
+//     return await response.json();
+//   }catch(error){
+//     throw new Error(`Error runnung API`)
+//   }
+// }
   
 
 
@@ -41,7 +43,7 @@ export async function uploadImage(image: File) {
 
   //get labels for the data 
   //meant to take in a path
-  const labels = await detectlabels(downloadURL)
+  // const labels = await detectlabels(downloadURL)
 
   //vectorise the labelsor upsert into database
   // const vectors = ;
@@ -54,7 +56,7 @@ export async function uploadImage(image: File) {
     id: unique_id, // uid for image
     userId:user.uid, // id for user - every user has their unique one
     name: image.name,
-    labels:labels,
+    // labels:labels,
     url: downloadURL, // Not sure where this will come in handy yet but keep it - maybe for displaying images
     size: image.size,
     type: image.type,
@@ -84,3 +86,62 @@ export const signInWithGoogle = async () => {
     await signOut(auth);
     console.log("User signed out"); // check if signed out
   };
+
+
+  export async function createAlbum(userId: string, albumName: string, imageIds: string[], isPublic: boolean = false) {
+    const albumId = uuidv4();
+    
+    // Create private album
+    await setDoc(doc(db, `users/${userId}/albums`, albumId), {
+      name: albumName,
+      imageIds,
+     
+      createdAt: serverTimestamp()
+    });
+  
+    // Create public version if needed
+    if (isPublic) {
+      await setDoc(doc(db, `publicAlbums`, albumId), {
+        name: albumName,
+        imageIds,
+        ownerId: userId,
+        
+        createdAt: serverTimestamp(),
+        
+        shareableLink: `/share/${albumId}`
+      });
+    }
+  
+    return albumId;
+  }
+
+  export async function getAlbumImages(userId: string, albumId: string) {
+    const albumRef = doc(db, `users/${userId}/albums`, albumId);
+    const albumSnap = await getDoc(albumRef);
+    
+    if (!albumSnap.exists()) {
+      throw new Error("Album not found");
+    }
+  
+    const albumData = albumSnap.data();
+    const imagesQuery = query(
+      collection(db, `users/${userId}/images`),
+      where(documentId(), 'in', albumData.imageIds)
+    );
+  
+    const querySnapshot = await getDocs(imagesQuery);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  }
+
+  export async function deleteAlbum(userId: string, albumId: string, isPublic: boolean) {
+    // Delete private album
+    await deleteDoc(doc(db, `users/${userId}/albums`, albumId));
+    
+    
+    if (isPublic) {
+      await deleteDoc(doc(db, 'publicAlbums', albumId));
+    }
+  }
+
+
+  

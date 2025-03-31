@@ -1,11 +1,8 @@
-//QUESTIONS
-// Should I add a feature to delete an image - most likely
 //Sorting
-//FRONT END SUCKS but backend seems to be efficient
+//FRONT END STILL SUCKS but backend seems to be efficient
 
-//IDEA
-//- for album create a new folder under user that has album and then under the album images and then make a shareable link
-// - might work lowkey
+//ALBUM
+//probbaly add the feature of sharing albums
 
 "use client";
 import React, { useState, useEffect } from "react";
@@ -52,8 +49,6 @@ const Home = () => {
           </button>
 
           <ImageUpload />
-
-          {/* COMPONENT REQUIRED - should display all images for the user at the moment*/}
           <UserImages />
         </>
       ) : (
