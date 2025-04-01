@@ -4,9 +4,10 @@
 
 import { storage, db,auth,provider } from "./firebaseConfig";  
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, setDoc, serverTimestamp, getDoc, collection, query, documentId, where, getDocs, deleteDoc } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc, collection, query, documentId, where, getDocs, deleteDoc, orderBy, startAfter, limit } from "firebase/firestore";
 import {v4 as uuidv4} from "uuid"; // npm install uuid - done
 import { signInWithPopup, signOut } from "firebase/auth";
+import { error } from "console";
 
 // let us call the detectlabels api
 
@@ -144,4 +145,76 @@ export const signInWithGoogle = async () => {
   }
 
 
+export const groupByMonth = (images: any[]) => {
+  return images.reduce((groups, image) => {
+    const date = new Date(image.uploadedAt?.seconds * 1000);
+    const monthYear = date.toLocaleDateString('en-US', { 
+      month: 'long', 
+      year: 'numeric' 
+    });
+    
+    if (!groups[monthYear]) {
+      groups[monthYear] = [];
+    }
+    groups[monthYear].push(image);
+    return groups;
+  }, {} as Record<string, any[]>);
+};
+
+export const loadMoreImages = async (
+  lastVisible: any, 
+  userId: string, 
+  batchSize = 20
+) => {
+  const q = query(
+    collection(db, `users/${userId}/images`),
+    orderBy("uploadedAt", "desc"),
+    startAfter(lastVisible),
+    limit(batchSize)
+  );
   
+  const snapshot = await getDocs(q);
+  return {
+    images: snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
+    lastVisible: snapshot.docs[snapshot.docs.length - 1]
+  };
+};
+
+// should i lowkey be defining this here? -- might edit later on
+//STUFF TO NOTE ON FOR THIS FUNCTION
+// binary blob - collection of binary data stored as a single entity
+export const downloadImage = async (url: string, name: string) => {
+  try {
+    // 1) fetch the image file based on the downloadurl
+    const response = await fetch(url);
+    //conver to a blob - basically binary shit
+    const blob = await response.blob();
+    //create a url for this blob
+    const blobUrl = window.URL.createObjectURL(blob);
+    //create an a tag(invisible link)
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = name || `image-${Date.now()}.jpg`; // forces to actually download instead of navigate
+    document.body.appendChild(a);
+    a.click(); //triggers the download
+    //clear
+    window.URL.revokeObjectURL(blobUrl);
+    a.remove();
+  } catch (error) {
+    console.error("Download failed:", error);
+    alert("Failed to download image");
+  }
+};
+
+export async function getImagebyId(imageId: string) {
+  try{
+    const user = auth.currentUser;
+    if(!user){return}
+    const imageRef = ref(storage, `users/${user.uid}/images/${imageId}`);
+    return await getDownloadURL(imageRef);
+  } catch (error) {
+    console.error("Error getting image URL:", error);
+
+  
+}}
+

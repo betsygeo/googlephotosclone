@@ -7,7 +7,11 @@ import React, { useState } from "react";
 import { uploadImage } from "../lib/firebase"; // firebase upload backend
 import "./ImageUpload.css"; // styling vs tailwind - HANDLE FRONT END LAST
 
-const ImageUpload: React.FC = () => {
+interface ImageUploadProps {
+  onComplete?: () => void;
+}
+
+const ImageUpload: React.FC<ImageUploadProps> = ({ onComplete }) => {
   const [image, setImage] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,6 +35,7 @@ const ImageUpload: React.FC = () => {
     // probably  a try/ catch / finally to set setuploading and image back to default
     try {
       const downloadURL = await uploadImage(image);
+      onComplete?.();
       console.log("Image uploaded:", downloadURL); // print to console for now
       alert(`Image uploaded: ${downloadURL}`); // should we alert? alert for now not sure yet
     } catch (err) {

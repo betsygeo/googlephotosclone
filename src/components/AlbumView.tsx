@@ -142,7 +142,7 @@ const AlbumView = ({
             />
             <button
               onClick={() => handleRemoveImage(img.id)}
-              className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+              className="absolute top-2 right-2 bg-amber-300 text-white rounded-full w-6 h-6 flex items-center justify-center hover:scale-110"
             >
               ×
             </button>
@@ -161,7 +161,7 @@ const AlbumView = ({
             />
             <button
               onClick={() => handleAddImage(img.id)}
-              className="absolute top-2 right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+              className="absolute top-2 right-2 bg-pink-300 text-white rounded-full w-6 h-6 flex items-center justify-center hover:scale-110"
             >
               +
             </button>
