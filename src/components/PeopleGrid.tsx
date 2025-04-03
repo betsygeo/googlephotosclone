@@ -24,7 +24,7 @@ export function PeopleGrid() {
         const FaceResponse = await fetch(api.getFaces(user.uid));
         const facesData = await FaceResponse.json();
 
-        //get faces
+        //get face crop
         const crops = await Promise.all(
           facesData.faces.map(async (face: any) => {
             const cropResponse = await fetch(
