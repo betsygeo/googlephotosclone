@@ -1,17 +1,8 @@
-UPDATES - DONE but searchbar
+GOOGLE PHOTOS CLONE
 
-- Can Sign in
-- Can now upload image for you as user
-- Can now view images for you as a user
-- Album creation with shareable - should be straightforward
-- Delete image - should be straightforward
-- work on Front End
+Link: https://googlephotosclone.vercel.app/
+Link: https://face-recognition-3jls.onrender.com/docs
 
----
+NOTE: The API is kinda slow, so you will want to make sure the API link is working before you use the actual website
 
-THING TO WORK ON
-
-- face recognition // still researching more about that
-- vectorising the labels
-- When you search your name/label, image comes up
-- when you click an image, similar images at the bottom
+Link to API Repository: https://github.com/betsygeo/face-recognition
