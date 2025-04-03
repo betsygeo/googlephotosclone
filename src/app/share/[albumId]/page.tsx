@@ -4,20 +4,17 @@ import { db } from "@/lib/firebaseConfig";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
-interface PageProps {
+type Props = {
   params: { albumId: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-}
+};
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `Album ${params.albumId}`,
   };
 }
 
-export default async function SharedAlbumPage({ params }: PageProps) {
+export default async function SharedAlbumPage({ params }: Props) {
   try {
     // Access params directly - no need to await
     const { albumId } = params;
