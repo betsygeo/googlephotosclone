@@ -4,7 +4,7 @@
 
 import { storage, db,auth,provider } from "./firebaseConfig";  
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, setDoc, serverTimestamp, getDoc, collection, query, documentId, where, getDocs, deleteDoc, orderBy, startAfter, limit, DocumentSnapshot } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc, collection, query, documentId, where, getDocs, deleteDoc,  } from "firebase/firestore";
 import {v4 as uuidv4} from "uuid"; // npm install uuid - done
 import { signInWithPopup, signOut } from "firebase/auth";
 

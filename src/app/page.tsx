@@ -8,10 +8,9 @@
 import React, { useState, useEffect } from "react";
 import { auth } from "../lib/firebaseConfig";
 import { User, onAuthStateChanged } from "firebase/auth";
-import { signInWithGoogle, signOutUser } from "../lib/firebase";
+import { signInWithGoogle } from "../lib/firebase";
 
 import PhotosLayout from "@/components/PhotosLayout";
-import ImageGrid from "@/components/ImageGrid";
 
 const Home = () => {
   const [user, setUser] = useState<User | null>(null);

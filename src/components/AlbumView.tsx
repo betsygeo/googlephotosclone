@@ -37,7 +37,7 @@ const AlbumView = ({
 }) => {
   const [album, setAlbum] = useState<PublicAlbum | null>(null);
   const [images, setImages] = useState<Images[]>([]);
-  const [availableImages, setAvailableImages] = useState<any[]>([]);
+  const [availableImages, setAvailableImages] = useState<Images[]>([]);
   const [loading, setLoading] = useState(true);
 
   //displaying the actual album
@@ -76,7 +76,7 @@ const AlbumView = ({
           setAvailableImages(
             allImagesSnap.docs
               .filter((doc) => !albumSnap.data().imageIds.includes(doc.id))
-              .map((doc) => ({ id: doc.id, ...doc.data() }))
+              .map((doc) => ({ id: doc.id, ...doc.data() } as Images))
           );
         }
       } catch (error) {
@@ -104,8 +104,11 @@ const AlbumView = ({
       }
 
       await batch.commit();
-      setImages([...images, availableImages.find((img) => img.id === imageId)]); // reset this stuff
-      setAvailableImages(availableImages.filter((img) => img.id !== imageId));
+      const foundImage = availableImages.find((img) => img.id === imageId);
+      if (foundImage) {
+        setImages([...images, foundImage]); // Add image only if it was found
+        setAvailableImages(availableImages.filter((img) => img.id !== imageId));
+      }
     } catch (error) {
       console.error("Error adding image:", error);
     }
@@ -128,11 +131,12 @@ const AlbumView = ({
       }
 
       await batch.commit();
-      setImages(images.filter((img) => img.id !== imageId));
-      setAvailableImages([
-        ...availableImages,
-        images.find((img) => img.id === imageId),
-      ]);
+      const foundImage = images.find((img) => img.id === imageId);
+
+      if (foundImage) {
+        setImages(images.filter((img) => img.id !== imageId)); // Remove image
+        setAvailableImages([...availableImages, foundImage]); // Add it back to available images
+      }
     } catch (error) {
       console.error("Error removing image:", error);
     }
