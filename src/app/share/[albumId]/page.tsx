@@ -2,22 +2,15 @@
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import { notFound } from "next/navigation";
-import { Metadata } from "next";
 
-type Props = {
-  params: { albumId: string };
-};
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  return {
-    title: `Album ${params.albumId}`,
-  };
-}
-
-export default async function SharedAlbumPage({ params }: Props) {
+export default async function SharedAlbumPage({
+  params,
+}: {
+  params: Promise<{ albumId: string }>;
+}) {
   try {
     // Access params directly - no need to await
-    const { albumId } = params;
+    const { albumId } = await params;
 
     //get the album data
     const albumRef = doc(db, "publicAlbums", albumId);
