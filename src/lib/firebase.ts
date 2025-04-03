@@ -9,49 +9,43 @@ import {v4 as uuidv4} from "uuid"; // npm install uuid - done
 import { signInWithPopup, signOut } from "firebase/auth";
 import { error } from "console";
 
-// let us call the detectlabels api
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-//DO WE NEED THIS?
+if (!API_URL) {
+  throw new Error('NEXT_PUBLIC_API_URL is not defined in environment variables');
+}
 
-// async function detectlabels(imagepath:string) {
-//   const apiurl = '/api/detectlabels';
-
-//   try{
-//     const response = await fetch(apiurl,{method: 'POST',headers:{'Content-Type': 'application/json'},body:JSON.stringify({imagepath})})
-//     if(!response.ok){
-//       throw new Error(`API called and resulted in ${response.status}`);
-//     }
-//     return await response.json();
-//   }catch(error){
-//     throw new Error(`Error runnung API`)
-//   }
-// }
-  
-
+export const api = {
+  uploadImageFace: (userId:string) => `${API_URL}/upload-image/${userId}`,
+  nameFace: (userId: string, faceId: string) => `${API_URL}/name-face/${userId}/${faceId}`,
+  getFaceImages: (userId: string, name: string) => 
+    `${API_URL}/person-images/${userId}/${encodeURIComponent(name)}`,
+  getFaceCrop: (userId: string, faceId: string) =>
+    `${API_URL}/face-crop/${userId}/${faceId}`,
+  getFaces: (userId:string) =>`${API_URL}/user-faces/${userId}`
+};
 
 // unique key bruh for storage and database - done
 export async function uploadImage(image: File) {
+
+  //authenticate image
   if (!image) throw new Error("No image file provided"); // Upload is greyed out if no image in CSS
+  
+  //authenticate user
   const user = auth.currentUser;
   if(!user) throw new Error("User not authenticated"); // probably never has this issue since Auth is the first page but just keep it for now
-  const unique_id = uuidv4();
- 
+  const unique_id = uuidv4(); //random_id
+  
+  //into storage
   const storage_ref = ref(storage, `users/${user.uid}images/${unique_id}`);  
-
- 
   const snapshot = await uploadBytes(storage_ref, image);
   const downloadURL = await getDownloadURL(snapshot.ref);
 
-  //get labels for the data 
-  //meant to take in a path
-  // const labels = await detectlabels(downloadURL)
+  const formData = new FormData();
+  console.log("Uploading image:", image.type, image.size);
+  formData.append('file', image, image.name);
 
-  //vectorise the labelsor upsert into database
-  // const vectors = ;
-
-  // Two Options
-  //- Sort by labels
-  // Sort by Vector similarity - involves some cosine and sin 
+  
 
   const metadata = {
     id: unique_id, // uid for image
@@ -64,12 +58,32 @@ export async function uploadImage(image: File) {
     uploadedAt: serverTimestamp(),  
 
   };
-
+  //into docs
   await setDoc(doc(db, `users/${user.uid}/images`, unique_id), metadata);
 
   console.log("Image metadata stored in Firestore:", user.uid, metadata); // check it works
 
-  return { id: unique_id, url: downloadURL };
+  try {
+    const response = await fetch(api.uploadImageFace(user.uid), {
+      method: 'POST',
+      body: formData,
+    });
+
+    const result = await response.json();
+    
+    return {
+      ...result,
+      firebaseUrl: downloadURL,
+      firebaseId: unique_id
+   }
+  } catch (error) {
+     console.error('No Face Detected:', error);
+     return {firebaseUrl: downloadURL,
+      firebaseId: unique_id,
+      error: 'Face processing failed'}
+  }
+
+  
 }
 
 export const signInWithGoogle = async () => {
