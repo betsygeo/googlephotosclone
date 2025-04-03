@@ -2,12 +2,22 @@
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 
-export default async function SharedAlbumPage({
-  params,
-}: {
+interface PageProps {
   params: { albumId: string };
-}) {
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  return {
+    title: `Album ${params.albumId}`,
+  };
+}
+
+export default async function SharedAlbumPage({ params }: PageProps) {
   try {
     // Access params directly - no need to await
     const { albumId } = params;
