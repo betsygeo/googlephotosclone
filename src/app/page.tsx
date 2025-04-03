@@ -7,14 +7,14 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { auth } from "../lib/firebaseConfig";
-import { onAuthStateChanged } from "firebase/auth";
+import { User, onAuthStateChanged } from "firebase/auth";
 import { signInWithGoogle, signOutUser } from "../lib/firebase";
 
 import PhotosLayout from "@/components/PhotosLayout";
 import ImageGrid from "@/components/ImageGrid";
 
 const Home = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -33,18 +33,11 @@ const Home = () => {
     }
   };
 
-  const handleSignOut = async () => {
-    await signOutUser();
-    setUser(null);
-  };
-
   return (
     <div>
       {user ? (
         <>
-          <PhotosLayout>
-            <ImageGrid />
-          </PhotosLayout>
+          <PhotosLayout />
         </>
       ) : (
         <>
@@ -54,9 +47,7 @@ const Home = () => {
                 <h1 className="text-3xl font-bold text-white mb-2">
                   Google Photos Clone
                 </h1>
-                <p className="text-gray-300">
-                  Let's store our favourite memories!
-                </p>
+                <p className="text-gray-300">Store our favourite memories!</p>
               </div>
 
               <div className="space-y-6">

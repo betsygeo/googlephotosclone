@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { auth, db } from "../lib/firebaseConfig";
 import { collection, query, onSnapshot, where } from "firebase/firestore";
 
-import { deleteAlbum, getImagebyId } from "@/lib/firebase";
+import { deleteAlbum } from "@/lib/firebase";
 import AlbumView from "./AlbumView";
 import Link from "next/link";
 import { FaRegTrashCan } from "react-icons/fa6";

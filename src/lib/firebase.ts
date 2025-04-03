@@ -4,10 +4,16 @@
 
 import { storage, db,auth,provider } from "./firebaseConfig";  
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, setDoc, serverTimestamp, getDoc, collection, query, documentId, where, getDocs, deleteDoc, orderBy, startAfter, limit } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc, collection, query, documentId, where, getDocs, deleteDoc, orderBy, startAfter, limit, DocumentSnapshot } from "firebase/firestore";
 import {v4 as uuidv4} from "uuid"; // npm install uuid - done
 import { signInWithPopup, signOut } from "firebase/auth";
-import { error } from "console";
+
+interface Image {
+  id: string;
+  url: string;
+  name: string;
+  uploadedAt: { seconds: number };
+}
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -159,7 +165,7 @@ export const signInWithGoogle = async () => {
   }
 
 
-export const groupByMonth = (images: any[]) => {
+export const groupByMonth = (images: Image[]) => {
   return images.reduce((groups, image) => {
     const date = new Date(image.uploadedAt?.seconds * 1000);
     const monthYear = date.toLocaleDateString('en-US', { 
@@ -172,27 +178,10 @@ export const groupByMonth = (images: any[]) => {
     }
     groups[monthYear].push(image);
     return groups;
-  }, {} as Record<string, any[]>);
+  }, {} as Record<string, Image[]>);
 };
 
-export const loadMoreImages = async (
-  lastVisible: any, 
-  userId: string, 
-  batchSize = 20
-) => {
-  const q = query(
-    collection(db, `users/${userId}/images`),
-    orderBy("uploadedAt", "desc"),
-    startAfter(lastVisible),
-    limit(batchSize)
-  );
-  
-  const snapshot = await getDocs(q);
-  return {
-    images: snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
-    lastVisible: snapshot.docs[snapshot.docs.length - 1]
-  };
-};
+
 
 // should i lowkey be defining this here? -- might edit later on
 //STUFF TO NOTE ON FOR THIS FUNCTION
@@ -220,15 +209,5 @@ export const downloadImage = async (url: string, name: string) => {
   }
 };
 
-export async function getImagebyId(imageId: string) {
-  try{
-    const user = auth.currentUser;
-    if(!user){return}
-    const imageRef = ref(storage, `users/${user.uid}/images/${imageId}`);
-    return await getDownloadURL(imageRef);
-  } catch (error) {
-    console.error("Error getting image URL:", error);
 
-  
-}}
 

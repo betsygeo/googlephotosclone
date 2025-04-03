@@ -16,6 +16,18 @@ import {
 
 //takes in the albumId of course
 // we need to know if it is public to decide if there is a shareable link or not
+
+interface PublicAlbum {
+  id: string;
+  name: string;
+  imageIds: string[];
+}
+
+interface Images {
+  id: string;
+  name: string;
+  url: string;
+}
 const AlbumView = ({
   albumId,
   isPublic,
@@ -23,8 +35,8 @@ const AlbumView = ({
   albumId: string;
   isPublic: boolean;
 }) => {
-  const [album, setAlbum] = useState<any>(null);
-  const [images, setImages] = useState<any[]>([]);
+  const [album, setAlbum] = useState<PublicAlbum | null>(null);
+  const [images, setImages] = useState<Images[]>([]);
   const [availableImages, setAvailableImages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,7 +54,7 @@ const AlbumView = ({
         const albumSnap = await getDoc(albumRef);
 
         if (albumSnap.exists()) {
-          setAlbum({ id: albumSnap.id, ...albumSnap.data() });
+          setAlbum({ id: albumSnap.id, ...albumSnap.data() } as PublicAlbum);
 
           // query avaiable images for the ones that are in the album
           const imagesQuery = query(
@@ -51,7 +63,9 @@ const AlbumView = ({
           );
           const imagesSnap = await getDocs(imagesQuery);
           setImages(
-            imagesSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+            imagesSnap.docs.map(
+              (doc) => ({ id: doc.id, ...doc.data() } as Images)
+            )
           );
 
           // get other images != album --- YUPPP

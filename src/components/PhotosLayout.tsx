@@ -20,30 +20,28 @@ import ImageGrid from "./ImageGrid";
 import SearchGrid from "./SearchGrid";
 import AlbumGrid from "./AlbumGrid";
 
-export default function PhotosLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+interface Image {
+  id: string;
+  url: string;
+  storage_path: string;
+  uploaded_at: string;
+  faces: string[];
+  named_faces: string[];
+}
+
+export default function PhotosLayout() {
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
+
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [activeView, setActiveView] = useState<"images" | "albums" | "people">(
     "images"
   );
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchActive, setSearchActive] = useState(false);
+  const [searchResults, setSearchResults] = useState<Image[]>([]);
 
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  const [searchActive, setSearchActive] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -62,7 +60,7 @@ export default function PhotosLayout({
   const handleSearch = async () => {
     if (!searchTerm.trim()) return;
     setSearchActive(true);
-    setIsLoading(true);
+
     try {
       const user = auth.currentUser;
       if (!user) throw new Error("Not authenticated");
@@ -77,7 +75,6 @@ export default function PhotosLayout({
       console.error("Search error:", error);
       setSearchResults([]);
     } finally {
-      setIsLoading(false);
     }
   };
 
@@ -92,12 +89,14 @@ export default function PhotosLayout({
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900">
       {/* Mobile Sidebar Toggle */}
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md"
-      >
-        {sidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-      </button>
+      {
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md"
+        >
+          {sidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+        </button>
+      }
       {/* Sidebar */}
       <div
         className={`

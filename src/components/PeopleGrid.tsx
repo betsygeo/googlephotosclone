@@ -2,10 +2,17 @@ import { useEffect, useState } from "react";
 import { auth } from "../lib/firebaseConfig";
 import { api } from "@/lib/firebase";
 
+type FaceData = {
+  face_id: string;
+  name?: string;
+  image_ref: string;
+};
+
 type FaceCrop = {
   face_id: string;
   image_url: string;
   name?: string;
+  image_ref: string;
 };
 
 export function PeopleGrid() {
@@ -26,7 +33,7 @@ export function PeopleGrid() {
 
         //get face crop
         const crops = await Promise.all(
-          facesData.faces.map(async (face: any) => {
+          facesData.faces.map(async (face: FaceData) => {
             const cropResponse = await fetch(
               api.getFaceCrop(user.uid, face.face_id)
             );

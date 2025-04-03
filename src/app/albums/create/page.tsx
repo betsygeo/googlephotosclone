@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { auth, db } from "@/lib/firebaseConfig";
 import { createAlbum } from "@/lib/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, getDocs } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -124,7 +124,7 @@ const CreateAlbumPage = () => {
               Select Images:
             </p>
             {images.length === 0 ? (
-              <p className="text-gray-500">You don't have any images yet.</p>
+              <p className="text-gray-500">No images yet.</p>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {images.map((img) => (

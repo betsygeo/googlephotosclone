@@ -1,4 +1,4 @@
-import { FiSearch, FiImage } from "react-icons/fi";
+import { FiImage } from "react-icons/fi";
 
 interface Image {
   id: string;
@@ -20,7 +20,7 @@ export function SearchGrid({
     return (
       <div>
         <h3 className="text-lg font-medium text-gray-900">
-          Search results for "{searchName}"
+          Search results for {searchName}
         </h3>
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <FiImage className="text-gray-400 text-4xl mb-4" />
@@ -32,9 +32,6 @@ export function SearchGrid({
 
   return (
     <div>
-      <h3 className="text-lg font-medium text-gray-900">
-        Search results for "{searchName}"
-      </h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 px-2">
         {images.map((img) => (
           <div key={img.id} className="relative aspect-square group">
