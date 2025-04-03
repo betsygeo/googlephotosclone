@@ -9,8 +9,7 @@ export default async function SharedAlbumPage({
   params: { albumId: string };
 }) {
   try {
-    //how to access the params
-
+    // Access params directly - no need to await
     const { albumId } = params;
 
     //get the album data
@@ -23,11 +22,11 @@ export default async function SharedAlbumPage({
 
     const album = albumSnap.data();
 
-    //display images -  have to get from the storage for each image cool
+    //display images - have to get from the storage for each image cool
     const images = await Promise.all(
       album.imageIds.map(async (imageId: string) => {
-        const imageRef = doc(db, `users/${album.ownerId}/images`, imageId); // get from database(doc)
-        const imageSnap = await getDoc(imageRef); // get the actual image form storage
+        const imageRef = doc(db, `users/${album.ownerId}/images`, imageId);
+        const imageSnap = await getDoc(imageRef);
         return imageSnap.exists() ? { id: imageId, ...imageSnap.data() } : null;
       })
     ).then((results) => results.filter(Boolean));
