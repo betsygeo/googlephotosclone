@@ -11,7 +11,7 @@ export default async function SharedAlbumPage({
   try {
     //how to access the params
 
-    const { albumId } = await params;
+    const { albumId } = params;
 
     //get the album data
     const albumRef = doc(db, "publicAlbums", albumId);
