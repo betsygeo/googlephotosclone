@@ -37,7 +37,6 @@ const AlbumGrid = () => {
     }
   };
 
-  // for all view
   useEffect(() => {
     const user = auth.currentUser;
     if (!user || viewMode === "public") return;
@@ -56,7 +55,6 @@ const AlbumGrid = () => {
     return () => unsubscribe();
   }, [viewMode]);
 
-  // for public
   useEffect(() => {
     const user = auth.currentUser;
     if (!user || viewMode === "all") return;
@@ -83,7 +81,7 @@ const AlbumGrid = () => {
       <div className="p-4">
         <button
           onClick={() => setSelectedAlbum(null)}
-          className="mb-4 px-4 py-2 bg-pink-200 rounded hover:bg-pink-300 transition"
+          className="mb-4 px-4 py-2 bg-pink-200 rounded hover:bg-pink-300 transition cursor-pointer"
         >
           ← Back to albums
         </button>
@@ -102,7 +100,7 @@ const AlbumGrid = () => {
         <div className="flex gap-3">
           <button
             onClick={() => setViewMode("all")}
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            className={`px-4 py-2 rounded-lg font-medium transition-all cursor-pointer ${
               viewMode === "all"
                 ? "bg-pink-300 text-white shadow-md"
                 : "bg-pink-100 hover:bg-gray-200"
@@ -112,7 +110,7 @@ const AlbumGrid = () => {
           </button>
           <button
             onClick={() => setViewMode("public")}
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            className={`px-4 py-2 rounded-lg font-medium transition-all cursor-pointer ${
               viewMode === "public"
                 ? "bg-pink-300 text-white shadow-md"
                 : "bg-pink-50 hover:bg-gray-200"
@@ -124,9 +122,16 @@ const AlbumGrid = () => {
         <div className="flex justify-end">
           <Link
             href="/albums/create"
-            className="bg-pink-400 hover:bg-gray-300 text-white font-medium py-2 px-4 rounded-lg transition-colors flex justify-end"
+            className="bg-pink-400 hover:bg-gray-300 text-white font-medium py-2 px-4 rounded-lg transition-colors flex justify-end mr-4"
           >
             Create Album
+          </Link>
+
+          <Link
+            href="/albums/autogenerate"
+            className="bg-pink-300 hover:bg-gray-300 text-white font-medium py-2 px-4 rounded-lg transition-colors flex justify-end"
+          >
+            AutoGenerate Album
           </Link>
         </div>
       </div>
@@ -138,7 +143,7 @@ const AlbumGrid = () => {
         {albums.map((album) => (
           <div
             key={album.id}
-            className="bg-amber-50 rounded-xl shadow-sm hover:scale-103 transition-shadow overflow-hidden border border-gray-100"
+            className="bg-amber-50 rounded-xl shadow-sm hover:scale-103 cursor-pointer transition-shadow overflow-hidden border border-gray-100"
           >
             {/* Album Cover*/}
             <div className="relative h-48">
@@ -185,7 +190,7 @@ const AlbumGrid = () => {
                           `${window.location.origin}/share/${album.id}`
                         )
                       }
-                      className="p-2 text-gray-500 hover:text-gray-700"
+                      className="p-2 text-gray-500 hover:text-gray-700 cursor-pointer"
                       title="Copy link"
                     >
                       <FaRegCopy className="w-4 h-4" />
@@ -199,13 +204,13 @@ const AlbumGrid = () => {
                   onClick={() =>
                     setSelectedAlbum({ id: album.id, isPublic: album.isPublic })
                   }
-                  className="flex-1 py-2 px-4 bg-pink-300 hover:bg-pink-400 text-white rounded-lg transition-colors"
+                  className="flex-1 py-2 px-4 bg-pink-300 hover:bg-pink-400 text-white rounded-lg transition-colors cursor-pointer"
                 >
                   View Album
                 </button>
                 <button
                   onClick={() => handleDeleteAlbum(album.id, album.isPublic)}
-                  className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+                  className="p-2 text-gray-500 hover:text-red-500 transition-colors cursor-pointer"
                   title="Delete album"
                 >
                   <FaRegTrashCan className="w-5 h-5" />

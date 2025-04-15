@@ -14,9 +14,6 @@ import {
   writeBatch,
 } from "firebase/firestore";
 
-//takes in the albumId of course
-// we need to know if it is public to decide if there is a shareable link or not
-
 interface PublicAlbum {
   id: string;
   name: string;
@@ -40,23 +37,19 @@ const AlbumView = ({
   const [availableImages, setAvailableImages] = useState<Images[]>([]);
   const [loading, setLoading] = useState(true);
 
-  //displaying the actual album
   useEffect(() => {
     const fetchAlbum = async () => {
       const user = auth.currentUser;
       if (!user) return;
 
       try {
-        //get the data - the usuals
         const albumRef = isPublic
           ? doc(db, "publicAlbums", albumId)
-          : doc(db, `users/${user.uid}/albums`, albumId); // check public or not
+          : doc(db, `users/${user.uid}/albums`, albumId);
         const albumSnap = await getDoc(albumRef);
 
         if (albumSnap.exists()) {
           setAlbum({ id: albumSnap.id, ...albumSnap.data() } as PublicAlbum);
-
-          // query avaiable images for the ones that are in the album
           const imagesQuery = query(
             collection(db, `users/${user.uid}/images`),
             where(documentId(), "in", albumSnap.data().imageIds || [])
@@ -67,8 +60,6 @@ const AlbumView = ({
               (doc) => ({ id: doc.id, ...doc.data() } as Images)
             )
           );
-
-          // get other images != album --- YUPPP
           const allImagesQuery = query(
             collection(db, `users/${user.uid}/images`)
           );
@@ -94,15 +85,13 @@ const AlbumView = ({
     if (!user) return;
 
     try {
-      // should work for either public or private
-      const batch = writeBatch(db); // edit the document fields
+      const batch = writeBatch(db);
       const privateRef = doc(db, `users/${user.uid}/albums`, albumId);
-      batch.update(privateRef, { imageIds: arrayUnion(imageId) }); // add the imageId
+      batch.update(privateRef, { imageIds: arrayUnion(imageId) });
       if (isPublic) {
         const publicRef = doc(db, "publicAlbums", albumId);
         batch.update(publicRef, { imageIds: arrayUnion(imageId) });
       }
-
       await batch.commit();
       const foundImage = availableImages.find((img) => img.id === imageId);
       if (foundImage) {
@@ -114,14 +103,12 @@ const AlbumView = ({
     }
   };
 
-  //same logic as the other stuff
   const handleRemoveImage = async (imageId: string) => {
     const user = auth.currentUser;
     if (!user) return;
 
     try {
       const batch = writeBatch(db);
-      // not using if else because we need to update both public and private versions
       const privateRef = doc(db, `users/${user.uid}/albums`, albumId);
       batch.update(privateRef, { imageIds: arrayRemove(imageId) });
 
@@ -134,8 +121,8 @@ const AlbumView = ({
       const foundImage = images.find((img) => img.id === imageId);
 
       if (foundImage) {
-        setImages(images.filter((img) => img.id !== imageId)); // Remove image
-        setAvailableImages([...availableImages, foundImage]); // Add it back to available images
+        setImages(images.filter((img) => img.id !== imageId));
+        setAvailableImages([...availableImages, foundImage]);
       }
     } catch (error) {
       console.error("Error removing image:", error);
@@ -145,7 +132,6 @@ const AlbumView = ({
   if (loading) return <div>Loading album...</div>;
   if (!album) return <div>Album not found</div>;
 
-  //display neccessary stuff
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">{album.name}</h1>
@@ -160,7 +146,7 @@ const AlbumView = ({
             />
             <button
               onClick={() => handleRemoveImage(img.id)}
-              className="absolute top-2 right-2 bg-amber-300 text-white rounded-full w-6 h-6 flex items-center justify-center hover:scale-110"
+              className="absolute top-2 right-2 cursor-pointer bg-amber-300 text-white rounded-full w-6 h-6 flex items-center justify-center hover:scale-110"
             >
               ×
             </button>
@@ -179,7 +165,7 @@ const AlbumView = ({
             />
             <button
               onClick={() => handleAddImage(img.id)}
-              className="absolute top-2 right-2 bg-pink-300 text-white rounded-full w-6 h-6 flex items-center justify-center hover:scale-110"
+              className="absolute top-2 right-2 cursor-pointer bg-pink-300 text-white rounded-full w-6 h-6 flex items-center justify-center hover:scale-110"
             >
               +
             </button>

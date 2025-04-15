@@ -213,7 +213,7 @@ export default function PhotosLayout() {
                 setSearchTerm("");
                 setSearchActive(false);
               }}
-              className="ml-2 text-sm text-pink-400 hover:text-pink-300"
+              className="ml-2 text-sm text-pink-400 hover:text-pink-300 cursor-pointer"
             >
               Clear
             </button>
@@ -222,7 +222,7 @@ export default function PhotosLayout() {
           {/* Upload Button */}
           <button
             onClick={() => setShowUploadModal(true)}
-            className="ml-4 p-2 bg-gray-300 text-white rounded-full hover:bg-pink-400 transition-colors"
+            className="ml-4 p-2 bg-gray-300 text-white rounded-full hover:bg-pink-400 transition-colors cursor-pointer"
           >
             <FiPlus className="w-5 h-5" />
           </button>

@@ -26,14 +26,10 @@ export function PeopleGrid() {
       try {
         const user = auth.currentUser;
         if (!user) return;
-
-        //get faces
         const FaceResponse = await fetch(api.getFaces(user.uid));
         const facesData = await FaceResponse.json();
-
-        //get face crop
         const crops = await Promise.all(
-          facesData.faces.map(async (face: FaceData) => {
+          facesData?.faces?.map(async (face: FaceData) => {
             const cropResponse = await fetch(
               api.getFaceCrop(user.uid, face.face_id)
             );
@@ -109,7 +105,7 @@ export function PeopleGrid() {
               <img
                 src={crop.image_url}
                 alt={`Face ${crop.face_id}`}
-                className="w-full h-[250px] object-contain rounded-xl " // Use object-contain to avoid cropping
+                className="w-full h-[250px] object-contain rounded-xl "
               />
             </div>
             {/* Display name below the image */}

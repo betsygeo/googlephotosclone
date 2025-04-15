@@ -55,16 +55,12 @@ export default function ImageGrid() {
       setLoading(false);
     });
 
-    return unsubscribe; // Return cleanup function
+    return unsubscribe;
   }, []);
-
-  //delete one image
   const handleDelete = async (imageId: string, imageUrl: string) => {
     try {
       const user = auth.currentUser;
       if (!user) return;
-
-      // is it in private or public albums
       const albumsQuery = query(
         collection(db, `users/${user.uid}/albums`),
         where("imageIds", "array-contains", imageId)
@@ -81,15 +77,11 @@ export default function ImageGrid() {
       ]);
 
       const batch = writeBatch(db);
-
-      //private album removal ---
       privateAlbumsSnap.forEach((doc) => {
         batch.update(doc.ref, {
           imageIds: arrayRemove(imageId),
         });
       });
-
-      //same for public
       publicAlbumsSnap.forEach((doc) => {
         batch.update(doc.ref, {
           imageIds: arrayRemove(imageId),
@@ -100,8 +92,6 @@ export default function ImageGrid() {
 
       const storageRef = ref(storage, imageUrl);
       await deleteObject(storageRef);
-
-      //bruh commit
       await batch.commit();
     } catch (error) {
       console.error("Error deleting image:", error);

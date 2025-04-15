@@ -1,11 +1,8 @@
-//UPDATE - not yet
-//Does the work mehn
-
-"use client"; // client component of course
+"use client";
 
 import React, { useState } from "react";
-import { uploadImage } from "../lib/firebase"; // firebase upload backend
-import "./ImageUpload.css"; // styling vs tailwind - HANDLE FRONT END LAST
+import { uploadImage } from "../lib/firebase";
+import "./ImageUpload.css";
 
 interface ImageUploadProps {
   onComplete?: () => void;
@@ -18,26 +15,23 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onComplete }) => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]); // only handles one for now, should i add a feature to add more than one?
+      setImage(e.target.files[0]);
     }
   };
 
   const handleUpload = async () => {
     if (!image) {
-      // no image uploaded
       alert("Please select an image to upload.");
       return;
     }
 
     setUploading(true);
     setError(null);
-
-    // probably  a try/ catch / finally to set setuploading and image back to default
     try {
       const downloadURL = await uploadImage(image);
       onComplete?.();
-      console.log("Image uploaded:", downloadURL); // print to console for now
-      alert(`Image uploaded: ${downloadURL}`); // should we alert? alert for now not sure yet
+      console.log("Image uploaded:", downloadURL);
+      alert(`Image uploaded: ${downloadURL}`);
     } catch (err) {
       console.error("Upload error:", err);
       setError("Failed to upload image.");
@@ -47,18 +41,17 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onComplete }) => {
     }
   };
 
-  // css definitely needs work
   return (
     <div className="upload-container">
       <input
         type="file"
-        accept="image/*" // only image type - png..
+        accept="image/*"
         onChange={handleFileChange}
         className="file-input"
       />
       <button
         onClick={handleUpload}
-        disabled={!image || uploading} // grey out effect
+        disabled={!image || uploading}
         className="upload-btn"
       >
         {uploading ? "Uploading..." : "Upload"}

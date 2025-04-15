@@ -22,7 +22,6 @@ const CreateAlbumPage = () => {
   const [images, setImages] = useState<Image[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch user's images when component mounts
   useEffect(() => {
     const fetchImages = async () => {
       const user = auth.currentUser;
@@ -32,10 +31,7 @@ const CreateAlbumPage = () => {
       }
 
       try {
-        const q = query(
-          collection(db, `users/${user.uid}/images`)
-          // Add any filters or sorting you need
-        );
+        const q = query(collection(db, `users/${user.uid}/images`));
         const querySnapshot = await getDocs(q);
         const imagesData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -70,7 +66,7 @@ const CreateAlbumPage = () => {
 
       await createAlbum(user.uid, albumName, selectedImages, isPublic);
       alert("Album created successfully!");
-      router.push("/"); // Navigate back to albums page after creation
+      router.push("/");
     } catch (error) {
       console.error("Album creation failed:", error);
       alert("Failed to create album");
