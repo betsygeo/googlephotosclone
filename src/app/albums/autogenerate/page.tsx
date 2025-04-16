@@ -7,6 +7,18 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
+type Match = {
+  id: string;
+  score: number;
+  metadata?: Record<string, unknown>;
+};
+
+type TextEmbeddingResponse = {
+  status: string;
+  vector_id: string;
+  matches: Match[];
+};
+
 const AutoCreateAlbumPage = () => {
   const router = useRouter();
   const [albumName, setAlbumName] = useState("");
@@ -27,10 +39,10 @@ const AutoCreateAlbumPage = () => {
       const res = await fetch(api.upsertText(user.uid, albumName), {
         method: "POST",
       });
-      const data = await res.json();
+      const data: TextEmbeddingResponse = await res.json();
       const matchVectorIds = data.matches
-        .filter((match: any) => match.score > 0.2)
-        .map((match: any) => match.id);
+        .filter((match) => match.score > 0.2)
+        .map((match) => match.id);
 
       if (matchVectorIds.length === 0) {
         console.log("No matches found above the threshold.");
@@ -52,7 +64,7 @@ const AutoCreateAlbumPage = () => {
 
       alert("Album created successfully!");
       router.push("/");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Album creation failed:", err);
       setError("Something went wrong creating the album.");
     } finally {
